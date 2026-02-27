@@ -1,23 +1,16 @@
 from fastapi import APIRouter
 from twilio.rest import Client
 
-
+from app.config import settings
 
 router = APIRouter()
 
 
-
-
-
-account_sid = "AC6720e0ab3392d259d6355020c3362fe2"
-auth_token = "1ec28d10a1ed68db5b5e7899fd63b5cd"
-
-
-
-
 # @router.get("/message")
 def whatsapp_message(phone: str, message: str):
-    client = Client(account_sid, auth_token)
+    if not settings.TWILIO_ACCOUNT_SID or not settings.TWILIO_AUTH_TOKEN:
+        raise ValueError("TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be set in .env")
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
     phone = "01521796083"
 
     message = client.messages.create(

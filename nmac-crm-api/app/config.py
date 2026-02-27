@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     EMAIL_HOST_PASSWORD: str = ""
     DEFAULT_FROM_EMAIL: str = ""
     SMS_API: str = ""
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
 
     MEDIA_DIR: str = "media/"
     MEDIA_ROOT: str = "media/"
