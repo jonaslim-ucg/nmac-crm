@@ -1,13 +1,15 @@
 import httpx
 from datetime import timedelta
 import isodate
-from pydantic import settings  # Or use pydantic settings for FastAPI
+
+from app.config import settings
+
 
 async def get_youtube_video_info(video_id: str):
     video_url = f"https://www.youtube.com/watch?v={video_id}"
     video_duration = None
 
-    API_KEY = getattr(settings, "YOUTUBE_API_KEY", None)
+    API_KEY = settings.YOUTUBE_API_KEY or None
     if not API_KEY:
         return {"video_url": video_url, "video_id": video_id, "video_duration": None}
 

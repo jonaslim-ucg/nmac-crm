@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import APIRouter, HTTPException, Depends, Form
 from applications.user.models import User
 from applications.site.settings import UserSettings, WorkHoursSettings

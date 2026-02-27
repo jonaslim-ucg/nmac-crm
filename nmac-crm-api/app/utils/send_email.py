@@ -7,18 +7,29 @@ from fastapi import UploadFile
 from app.config import settings
 
 # ==================================================
-# MAIL CONFIG
+# MAIL CONFIG (lazy – only when email is configured)
 # ==================================================
-conf = ConnectionConfig(
-    MAIL_USERNAME=settings.EMAIL_HOST_USER,
-    MAIL_PASSWORD=settings.EMAIL_HOST_PASSWORD,
-    MAIL_FROM=settings.EMAIL_HOST_USER,
-    MAIL_PORT=settings.EMAIL_PORT,
-    MAIL_SERVER=settings.EMAIL_HOST,
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,
-    USE_CREDENTIALS=True,
-)
+_conf: Optional[ConnectionConfig] = None
+
+
+def _get_mail_conf() -> Optional[ConnectionConfig]:
+    """Build mail config only when EMAIL_HOST_USER is set (valid email). Allows app to start without email."""
+    global _conf
+    if _conf is not None:
+        return _conf
+    if not settings.EMAIL_HOST_USER or "@" not in settings.EMAIL_HOST_USER:
+        return None
+    _conf = ConnectionConfig(
+        MAIL_USERNAME=settings.EMAIL_HOST_USER,
+        MAIL_PASSWORD=settings.EMAIL_HOST_PASSWORD,
+        MAIL_FROM=settings.EMAIL_HOST_USER,
+        MAIL_PORT=settings.EMAIL_PORT,
+        MAIL_SERVER=settings.EMAIL_HOST,
+        MAIL_STARTTLS=True,
+        MAIL_SSL_TLS=False,
+        USE_CREDENTIALS=True,
+    )
+    return _conf
 
 # ==================================================
 # SEND EMAIL FUNCTION
@@ -65,6 +76,11 @@ async def send_email(
     recipients = [to] if isinstance(to, str) else list(to)
     cc_list = cc or []
     bcc_list = bcc or []
+
+    conf = _get_mail_conf()
+    if conf is None:
+        print("⚠️ Email not configured (EMAIL_HOST_USER empty); skipping send.", flush=True)
+        return False
 
     # Create message
     msg = MessageSchema(

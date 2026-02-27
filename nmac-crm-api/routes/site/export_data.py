@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import APIRouter, Depends, Query, HTTPException
 from app.auth import role_required
 from typing import Any

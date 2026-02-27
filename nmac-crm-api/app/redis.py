@@ -1,5 +1,8 @@
+from typing import Optional
+
 from redis.asyncio import Redis
-redis_client: Redis | None = None
+
+redis_client: Optional[Redis] = None
 from app.config import settings
 
 REDIS_URL: str = settings.REDIS_URL

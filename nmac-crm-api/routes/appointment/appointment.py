@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.params import Form, Depends
@@ -7,7 +9,7 @@ from applications.appointment.models import Appointment, AppointmentStatus
 from applications.patient.models import Patient
 from applications.user.models import User, UserRole
 from app.auth import login_required, role_required
-from datetime import date, time, datetime, UTC
+from datetime import date, time, datetime, timezone
 
 
 async def serialize_appointment(appointment: "Appointment") -> Dict[str, Any]:
@@ -115,9 +117,9 @@ async def create_appointment(
                 appointment_time, "%H:%M:%S"
             ).time()
             aware_time = datetime.combine(
-                appointment_date, naive_time, tzinfo=UTC
+                appointment_date, naive_time, tzinfo=timezone.utc
             )
-            utc_time = aware_time.astimezone(UTC)
+            utc_time = aware_time.astimezone(timezone.utc)
 
             parsed_time = utc_time.time().replace(tzinfo=None)
 

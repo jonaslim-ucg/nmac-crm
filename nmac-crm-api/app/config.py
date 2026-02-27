@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     SMS_API: str = ""
     TWILIO_ACCOUNT_SID: str = ""
     TWILIO_AUTH_TOKEN: str = ""
+    YOUTUBE_API_KEY: str = ""
 
     MEDIA_DIR: str = "media/"
     MEDIA_ROOT: str = "media/"
@@ -43,7 +44,12 @@ class Settings(BaseSettings):
             return
 
         if self.DB_ENGINE == "sqlite":
-            self.DATABASE_URL = f"sqlite:///{self.DB_NAME}"
+            # Use absolute path so DB is always in API project dir (aerich/uvicorn from any cwd)
+            db_path = Path(self.DB_NAME)
+            if not db_path.is_absolute():
+                api_root = Path(__file__).resolve().parent.parent
+                db_path = (api_root / self.DB_NAME).resolve()
+            self.DATABASE_URL = f"sqlite:///{db_path}"
         else:
             self.DATABASE_URL = (
                 f"{self.DB_ENGINE}://{self.DB_USER}:{self.DB_PASSWORD}"

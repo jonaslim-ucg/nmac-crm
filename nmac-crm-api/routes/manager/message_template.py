@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import FastAPI, APIRouter, Form, HTTPException, Query, Depends
 from applications.communication.message_template  import MessageTemplate , Message 
 from applications.patient.models import Patient, PatientContact
