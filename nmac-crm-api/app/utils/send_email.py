@@ -19,10 +19,15 @@ def _get_mail_conf() -> Optional[ConnectionConfig]:
         return _conf
     if not settings.EMAIL_HOST_USER or "@" not in settings.EMAIL_HOST_USER:
         return None
+    from_email = (
+        settings.DEFAULT_FROM_EMAIL
+        if settings.DEFAULT_FROM_EMAIL and "@" in settings.DEFAULT_FROM_EMAIL
+        else settings.EMAIL_HOST_USER
+    )
     _conf = ConnectionConfig(
         MAIL_USERNAME=settings.EMAIL_HOST_USER,
         MAIL_PASSWORD=settings.EMAIL_HOST_PASSWORD,
-        MAIL_FROM=settings.EMAIL_HOST_USER,
+        MAIL_FROM=from_email,
         MAIL_PORT=settings.EMAIL_PORT,
         MAIL_SERVER=settings.EMAIL_HOST,
         MAIL_STARTTLS=True,
@@ -59,11 +64,16 @@ async def send_email(
     delay: int = 2,
 ) -> bool:
 
-    if from_email and from_email != settings.EMAIL_HOST_USER:
-        sender_email = settings.EMAIL_HOST_USER
+    _default_from = (
+        settings.DEFAULT_FROM_EMAIL
+        if settings.DEFAULT_FROM_EMAIL and "@" in settings.DEFAULT_FROM_EMAIL
+        else settings.EMAIL_HOST_USER
+    )
+    if from_email and from_email != _default_from and from_email != settings.EMAIL_HOST_USER:
+        sender_email = _default_from
         reply_to_list = reply_to or [from_email]
     else:
-        sender_email = from_email or settings.EMAIL_HOST_USER
+        sender_email = from_email or _default_from
         reply_to_list = reply_to or []
 
     # Compose body

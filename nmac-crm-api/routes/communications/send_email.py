@@ -37,6 +37,9 @@ async def send_dynamic_email(payload: EmailPayload):
         if result:
             return {"message": "Email sent successfully", "recipients": payload.to}
         else:
-            raise HTTPException(status_code=500, detail="Failed to send email")
+            raise HTTPException(
+                status_code=503,
+                detail="Email service not configured. Set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in .env.",
+            )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")

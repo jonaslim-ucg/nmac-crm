@@ -16,6 +16,11 @@ async def send_sms(
     timeout: int = 5,
     retries: int = 2
 ) -> bool:
+    if not settings.SMS_API or not settings.SMS_API.strip():
+        raise HTTPException(
+            status_code=503,
+            detail="SMS not configured. Set SMS_API in .env (e.g. api.sms.net.bd API key).",
+        )
     if not phone_number or len(phone_number) < 10:
         raise HTTPException(status_code=400, detail="Invalid phone number")
 

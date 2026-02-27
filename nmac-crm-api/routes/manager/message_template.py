@@ -236,7 +236,7 @@ async def message_using_templates(temp_id: int, patient_id:str , user: User = De
     if template.communication_type == "both":
         if contact and contact.email:
             result = await send_dynamic_email(EmailPayload(subject=subject,
-                                                       to="sarafat.j010@gmail.com",
+                                                       to=contact.email,
                                                          message=message))
         elif contact and contact.phone:
             result = whatsapp_message(contact.phone, subject+message)
@@ -246,9 +246,12 @@ async def message_using_templates(temp_id: int, patient_id:str , user: User = De
 
 
     if template.communication_type == "email":
-        result = await send_dynamic_email(EmailPayload(subject=subject,
-                                                       to="sarafat.j010@gmail.com",
-                                                       message=message))
+        if contact and contact.email:
+            result = await send_dynamic_email(EmailPayload(subject=subject,
+                                                          to=contact.email,
+                                                          message=message))
+        else:
+            raise HTTPException(status_code=400, detail="Patient has no email contact for email template.")
 
     return result
 
@@ -319,7 +322,7 @@ async def whatsapp_message_endpoint(patient_id: str, platform: str, subject: Opt
     elif platform == "email":
         result = await send_dynamic_email(EmailPayload(
             subject=subject if subject else "",
-            to="sarafat.j010@gmail.com", #contact.email,
+            to=contact.email,
             message=message
         ))
     
